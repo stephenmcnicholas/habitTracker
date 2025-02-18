@@ -72,59 +72,78 @@ const HabitTracker = () => {
 
   const weekDates = getWeekDates(currentDate);
 
-  const calculateStats = (entries) => {
-    const dates = Object.keys(entries).sort();
-    const total = dates.length;
-    if (total === 0) return { total: 0, totalDays: 1, currentStreak: 0, longestStreak: 0 };
+ const calculateStats = (entries) => {
+  const dates = Object.keys(entries).sort();
+  const total = dates.length;
+  if (total === 0) return { total: 0, totalDays: 1, currentStreak: 0, longestStreak: 0 };
 
-    const firstDate = new Date(Math.min(...dates.map(d => new Date(d))));
-    const today = new Date();
-    const totalDays = Math.floor((today - firstDate) / (1000 * 60 * 60 * 24)) + 1;
+  const firstDate = new Date(Math.min(...dates.map(d => new Date(d))));
+  const today = new Date();
+  const totalDays = Math.floor((today - firstDate) / (1000 * 60 * 60 * 24)) + 1;
 
-    let currentStreak = 0;
-    let longestStreak = 0;
-    let tempStreak = 0;
+  let currentStreak = 0;
+  let longestStreak = 0;
+  let tempStreak = 0;
 
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = formatDate(yesterday);
+  // Get today and yesterday's date strings
+  const todayStr = formatDate(today);
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = formatDate(yesterday);
 
-    const hasYesterday = dates.includes(yesterdayStr);
+  // Check if we have today or yesterday
+  const hasToday = dates.includes(todayStr);
+  const hasYesterday = dates.includes(yesterdayStr);
 
-    for (let i = 0; i < dates.length; i++) {
-      const currentDate = new Date(dates[i]);
-      const nextDate = i < dates.length - 1 ? new Date(dates[i + 1]) : null;
+  // Calculate longest streak
+  for (let i = 0; i < dates.length; i++) {
+    const currentDate = new Date(dates[i]);
+    const nextDate = i < dates.length - 1 ? new Date(dates[i + 1]) : null;
 
-      tempStreak++;
+    tempStreak++;
 
-      if (nextDate) {
-        const daysDiff = Math.floor((nextDate - currentDate) / (1000 * 60 * 60 * 24));
-        if (daysDiff > 1) {
-          longestStreak = Math.max(longestStreak, tempStreak);
-          tempStreak = 0;
-        }
-      } else {
+    if (nextDate) {
+      const daysDiff = Math.floor((nextDate - currentDate) / (1000 * 60 * 60 * 24));
+      if (daysDiff > 1) {
         longestStreak = Math.max(longestStreak, tempStreak);
+        tempStreak = 0;
+      }
+    } else {
+      longestStreak = Math.max(longestStreak, tempStreak);
+    }
+  }
+
+  // Calculate current streak
+  if (hasToday) {
+    currentStreak = 1;
+    let checkDate = new Date(today);
+    
+    while (true) {
+      checkDate.setDate(checkDate.getDate() - 1);
+      const checkDateStr = formatDate(checkDate);
+      if (dates.includes(checkDateStr)) {
+        currentStreak++;
+      } else {
+        break;
       }
     }
+  } else if (hasYesterday) {
+    currentStreak = 1;
+    let checkDate = new Date(yesterday);
 
-    if (hasYesterday) {
-      currentStreak = 1;
-      let checkDate = new Date(yesterday);
-
-      while (true) {
-        checkDate.setDate(checkDate.getDate() - 1);
-        const checkDateStr = formatDate(checkDate);
-        if (dates.includes(checkDateStr)) {
-          currentStreak++;
-        } else {
-          break;
-        }
+    while (true) {
+      checkDate.setDate(checkDate.getDate() - 1);
+      const checkDateStr = formatDate(checkDate);
+      if (dates.includes(checkDateStr)) {
+        currentStreak++;
+      } else {
+        break;
       }
     }
+  }
 
-    return { total, totalDays, currentStreak, longestStreak };
-  };
+  return { total, totalDays, currentStreak, longestStreak };
+}; 
 
 // HabitTracker.jsx (Part 2 of 2)
 
@@ -234,31 +253,38 @@ const HabitTracker = () => {
                 <h3 className="font-medium">{habit.name}</h3>
                 <div className="text-sm text-gray-500 text-right">
                   <span className="mr-4">Total: {stats.total}/{stats.totalDays}</span>
-                  <span>Streak: {stats.currentStreak}/{stats.longestStreak}</span>
+                  <span>Current: {stats.currentStreak} </span>
+                  <span>Record: {stats.longestStreak}</span>
                 </div>
               </div>
               <div className="grid grid-cols-7 gap-2">
-                {weekDates.map(date => {
-                  const dateStr = formatDate(date);
-                  const isCompleted = habit.entries[dateStr];
-                  const disabled = isFuture(date);
-                  
-                  return (
-                    <button
-                      key={dateStr}
-                      onClick={() => toggleHabitForDate(habit.id, date)}
-                      disabled={disabled}
-                      className={`
-                        p-2 rounded-full w-10 h-10 flex items-center justify-center
-                        ${isCompleted ? 'bg-green-500 text-white' : 'bg-gray-100'}
-                        ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80'}
-                      `}
-                    >
-                      {date.getDate()}
-                    </button>
-                  );
-                })}
-              </div>
+  {weekDates.map(date => {
+    const dateStr = formatDate(date);
+    const isCompleted = habit.entries[dateStr];
+    const disabled = isFuture(date);
+    const isToday = formatDate(new Date()) === dateStr;
+    
+    return (
+      <div key={dateStr} className="flex flex-col items-center">
+        <div className="text-sm text-gray-500 mb-1">
+          {date.toLocaleDateString('en-US', { weekday: 'short' })}
+        </div>
+        <button
+          onClick={() => toggleHabitForDate(habit.id, date)}
+          disabled={disabled}
+          className={`
+            p-2 rounded-full w-10 h-10 flex items-center justify-center relative
+            ${isCompleted ? 'bg-green-500 text-white' : 'bg-gray-100'}
+            ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80'}
+            ${isToday ? 'ring-2 ring-blue-300' : ''}
+          `}
+        >
+          {date.getDate()}
+        </button>
+      </div>
+    );
+  })}
+</div>
             </div>
           );
         })}
