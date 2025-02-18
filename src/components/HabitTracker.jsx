@@ -1,16 +1,19 @@
+// HabitTracker.jsx (Part 1 of 2)
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { collection, getDocs, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { db } from '../firebase';
+import { useNavigate } from 'react-router-dom';
 
 const HabitTracker = () => {
+  const navigate = useNavigate();
   const [habits, setHabits] = useState([]);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showAddHabit, setShowAddHabit] = useState(false);
   const [newHabitName, setNewHabitName] = useState('');
+  const [newHabitMinutes, setNewHabitMinutes] = useState('5');
   const [loading, setLoading] = useState(true);
 
-  // Fetch habits from Firestore
   useEffect(() => {
     const fetchHabits = async () => {
       try {
@@ -32,10 +35,9 @@ const HabitTracker = () => {
     fetchHabits();
   }, []);
 
-  // Helper functions for date manipulation
   const getWeekDates = (date) => {
     const curr = new Date(date);
-    const first = curr.getDate() - curr.getDay() + 1; // Starting from Monday
+    const first = curr.getDate() - curr.getDay() + 1;
     return Array.from({ length: 7 }, (_, i) => {
       const day = new Date(curr);
       day.setDate(first + i);
@@ -62,19 +64,14 @@ const HabitTracker = () => {
     });
   };
 
-  const getWeekdayName = (date) => {
-    return date.toLocaleDateString('en-US', { weekday: 'short' });
-  };
-
   const isFuture = (date) => {
     const today = new Date();
-    today.setHours(23, 59, 59, 999);  // Set to end of today
+    today.setHours(23, 59, 59, 999);
     return date > today;
   };
 
   const weekDates = getWeekDates(currentDate);
 
-  // Calculate stats for a habit including streaks
   const calculateStats = (entries) => {
     const dates = Object.keys(entries).sort();
     const total = dates.length;
@@ -84,20 +81,16 @@ const HabitTracker = () => {
     const today = new Date();
     const totalDays = Math.floor((today - firstDate) / (1000 * 60 * 60 * 24)) + 1;
 
-    // Calculate streaks
     let currentStreak = 0;
     let longestStreak = 0;
     let tempStreak = 0;
 
-    // Get yesterday's date string
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayStr = formatDate(yesterday);
 
-    // Check if the last entry was yesterday
     const hasYesterday = dates.includes(yesterdayStr);
 
-    // Calculate longest streak
     for (let i = 0; i < dates.length; i++) {
       const currentDate = new Date(dates[i]);
       const nextDate = i < dates.length - 1 ? new Date(dates[i + 1]) : null;
@@ -115,12 +108,10 @@ const HabitTracker = () => {
       }
     }
 
-    // Calculate current streak
     if (hasYesterday) {
-      currentStreak = 1; // Start with yesterday
+      currentStreak = 1;
       let checkDate = new Date(yesterday);
 
-      // Count backwards from yesterday until we find a gap
       while (true) {
         checkDate.setDate(checkDate.getDate() - 1);
         const checkDateStr = formatDate(checkDate);
@@ -135,7 +126,8 @@ const HabitTracker = () => {
     return { total, totalDays, currentStreak, longestStreak };
   };
 
-  // Toggle habit completion for a date
+// HabitTracker.jsx (Part 2 of 2)
+
   const toggleHabitForDate = async (habitId, date) => {
     if (!isFuture(date)) {
       try {
@@ -148,10 +140,19 @@ const HabitTracker = () => {
           delete newEntries[dateStr];
         } else {
           newEntries[dateStr] = true;
+          
+          // Check if this is today's date
+          const today = new Date();
+          const clickedDate = new Date(date);
+          if (formatDate(today) === formatDate(clickedDate)) {
+            // If it's today, navigate to timer with the habit's minutes
+            await updateDoc(habitRef, { entries: newEntries });
+            navigate(`/timer?minutes=${habit.minutes || 5}`);
+            return;
+          }
         }
 
         await updateDoc(habitRef, { entries: newEntries });
-
         setHabits(prevHabits =>
           prevHabits.map(h =>
             h.id === habitId
@@ -165,13 +166,13 @@ const HabitTracker = () => {
     }
   };
 
-  // Add new habit
   const addNewHabit = async () => {
     if (newHabitName.trim()) {
       try {
         const habitsCollection = collection(db, 'habits');
         const newHabitData = {
           name: newHabitName.trim(),
+          minutes: parseInt(newHabitMinutes) || 5,
           entries: {},
           createdAt: new Date().toISOString()
         };
@@ -184,6 +185,7 @@ const HabitTracker = () => {
 
         setHabits(prev => [...prev, newHabit]);
         setNewHabitName('');
+        setNewHabitMinutes('5');
         setShowAddHabit(false);
       } catch (error) {
         console.error('Error adding habit:', error);
@@ -236,22 +238,26 @@ const HabitTracker = () => {
                 </div>
               </div>
               <div className="grid grid-cols-7 gap-2">
-                {weekDates.map(date => (
-                  <div key={`day-${formatDate(date)}`} className="flex flex-col items-center">
-                    <div className="text-sm text-gray-500 mb-1">{getWeekdayName(date)}</div>
+                {weekDates.map(date => {
+                  const dateStr = formatDate(date);
+                  const isCompleted = habit.entries[dateStr];
+                  const disabled = isFuture(date);
+                  
+                  return (
                     <button
+                      key={dateStr}
                       onClick={() => toggleHabitForDate(habit.id, date)}
-                      disabled={isFuture(date)}
+                      disabled={disabled}
                       className={`
                         p-2 rounded-full w-10 h-10 flex items-center justify-center
-                        ${habit.entries[formatDate(date)] ? 'bg-green-500 text-white' : 'bg-gray-100'}
-                        ${isFuture(date) ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80'}
+                        ${isCompleted ? 'bg-green-500 text-white' : 'bg-gray-100'}
+                        ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80'}
                       `}
                     >
                       {date.getDate()}
                     </button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           );
@@ -260,26 +266,39 @@ const HabitTracker = () => {
 
       {showAddHabit ? (
         <div className="mt-4 p-4 bg-white rounded-lg shadow">
-          <input
-            type="text"
-            value={newHabitName}
-            onChange={(e) => setNewHabitName(e.target.value)}
-            placeholder="New habit name"
-            className="w-full p-2 border rounded mb-2"
-          />
-          <div className="flex justify-end space-x-2">
-            <button
-              onClick={() => setShowAddHabit(false)}
-              className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={addNewHabit}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              +
-            </button>
+          <div className="space-y-4">
+            <input
+              type="text"
+              value={newHabitName}
+              onChange={(e) => setNewHabitName(e.target.value)}
+              placeholder="New habit name"
+              className="w-full p-2 border rounded"
+            />
+            <div className="flex items-center space-x-2">
+              <label className="text-sm text-gray-600">Minutes of practice:</label>
+              <input
+                type="number"
+                value={newHabitMinutes}
+                onChange={(e) => setNewHabitMinutes(e.target.value)}
+                min="1"
+                max="60"
+                className="w-20 p-2 border rounded"
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setShowAddHabit(false)}
+                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={addNewHabit}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Add
+              </button>
+            </div>
           </div>
         </div>
       ) : (
@@ -288,7 +307,7 @@ const HabitTracker = () => {
           className="mt-4 w-full p-4 flex items-center justify-center space-x-2 bg-white rounded-lg shadow hover:bg-gray-50"
         >
           <Plus className="w-5 h-5" />
-          <span> </span>
+          <span>Add New Habit</span>
         </button>
       )}
     </div>
