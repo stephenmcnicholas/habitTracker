@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
-// For Gradient Energy Slider
 //import { GradientEnergySlider} from './EnergySliders';
-// For Segmented Slider
 import { SegmentedEnergySlider} from './EnergySliders';
-// For Custom Thumb Slider
 //import { CustomThumbEnergySlider} from './EnergySliders';
 import { CircularSleepSlider } from './EnergySliders';
 
@@ -129,8 +126,8 @@ const DailyLog = () => {
         setEnergyValue(value);
       }}
     />
-  </div>
-</div>
+  </div>    
+    </div>
 
         <div className="flex items-center space-x-3">
           <label className="font-semibold dark:text-white text-lg">Alcohol</label>

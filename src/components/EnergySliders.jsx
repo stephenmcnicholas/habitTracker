@@ -97,7 +97,7 @@ export const SegmentedEnergySlider = ({ value, onChange }) => {
         onTouchEnd={handleTouchEnd}
       >
         {/* Label - Positioned absolutely */}
-        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-semibold text-gray-700 dark:text-white bg-red-500 px-2 rounded z-50">
+        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-semibold text-gray-700 dark:text-white bg-transparent px-2 rounded z-50">
           Energy
         </span>
 
@@ -335,4 +335,5 @@ export const CircularSleepSlider = ({ value, onChange }) => {
     </div>
   );
 };
+
 
