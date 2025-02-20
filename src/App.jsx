@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import HabitTracker from './components/HabitTracker';
 import CountdownTimer from './components/CountdownTimer';
 import DarkModeToggle from './components/DarkModeToggle'; 
@@ -8,7 +8,7 @@ import DailyLog from './components/DailyLog';
 
 function App() {
   return (
-    <Router basename="/habittracker">
+    <Router>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-white">
         <nav className="p-4 bg-white shadow dark:bg-gray-800 dark:shadow-lg">
           <div className="max-w-2xl mx-auto flex justify-between items-center">
