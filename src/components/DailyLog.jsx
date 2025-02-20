@@ -12,7 +12,7 @@ import { CircularSleepSlider } from './EnergySliders';
 
 const DailyLog = () => {
   const [formData, setFormData] = useState({
-    sleep: 7,
+    sleep: 8,
     energy: 3,
     alc: 0
   });
@@ -109,7 +109,6 @@ const DailyLog = () => {
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          {/*<label className="block mb-2 font-semibold dark:text-white">Sleep</label>*/}
           <CircularSleepSlider 
             value={formData.sleep}
             onChange={(hours) => {
@@ -120,7 +119,7 @@ const DailyLog = () => {
         </div>
 
         <div>
-  <label className="block mb-2 font-semibold dark:text-white">Energy</label>
+  {/*<label className="block mb-2 font-semibold dark:text-white">Energy</label> */}
   <div className="space-y-2">
     <SegmentedEnergySlider 
       value={formData.energy}
@@ -133,15 +132,15 @@ const DailyLog = () => {
   </div>
 </div>
 
-        <div>
-          <label className="block mb-2 font-semibold dark:text-white">Alcohol</label>
-          <input 
-            type="number" 
-            value={formData.alc}
-            onChange={(e) => setFormData(prev => ({ ...prev, alc: e.target.value }))}
-            min="0" 
-            className="w-20 p-2 border rounded dark:bg-gray-700 dark:text-white dark:border-gray-600"
-          />
+        <div className="flex items-center space-x-3">
+          <label className="font-semibold dark:text-white text-lg">Alcohol</label>
+            <input 
+              type="number" 
+              value={formData.alc}
+              onChange={(e) => setFormData(prev => ({ ...prev, alc: e.target.value }))}
+              min="0" 
+              className="w-20 p-2 border items-center rounded dark:bg-gray-700 dark:text-white dark:border-gray-600"
+            />
         </div>
 
         <button 
@@ -166,7 +165,7 @@ const DailyLog = () => {
           </div>
         </div>
 
-        <h2 className="text-xl font-bold mb-4 dark:text-white">Last 7 Days Summary</h2>
+        <h2 className="text-xl font-bold mb-4 dark:text-white">Last 7 Days</h2>
         
         <div className="grid grid-cols-3 gap-4">
           <div className="bg-white p-4 rounded shadow dark:bg-gray-700">
