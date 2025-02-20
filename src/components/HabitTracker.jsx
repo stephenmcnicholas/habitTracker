@@ -217,30 +217,30 @@ const HabitTracker = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-4">
+    <div className="max-w-2xl mx-auto p-4 dark:bg-gray-900 dark:text-white">
       <div className="flex justify-between items-center mb-6">
         <button 
-          className="p-2 rounded-full hover:bg-gray-100"
+          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
           onClick={() => {
             const newDate = new Date(currentDate);
             newDate.setDate(currentDate.getDate() - 7);
             setCurrentDate(newDate);
           }}
         >
-          <ChevronLeft className="w-6 h-6" />
+          <ChevronLeft className="w-6 h-6" dark:text-white />
         </button>
-        <h2 className="text-lg font-semibold">
+        <h2 className="text-lg font-semibold" dark:text-white>
           {formatDisplayDate(weekDates[0])} - {formatDisplayYear(weekDates[6])}
         </h2>
         <button 
-          className="p-2 rounded-full hover:bg-gray-100"
+          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
           onClick={() => {
             const newDate = new Date(currentDate);
             newDate.setDate(currentDate.getDate() + 7);
             setCurrentDate(newDate);
           }}
         >
-          <ChevronRight className="w-6 h-6" />
+          <ChevronRight className="w-6 h-6 dark:text-white" />
         </button>
       </div>
 
@@ -248,10 +248,10 @@ const HabitTracker = () => {
         {habits.map(habit => {
           const stats = calculateStats(habit.entries);
           return (
-            <div key={habit.id} className="bg-white rounded-lg shadow p-4">
+            <div key={habit.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="font-medium">{habit.name}</h3>
-                <div className="text-sm text-gray-500 text-right">
+                <h3 className="font-medium dark:text-white">{habit.name}</h3>
+                <div className="text-sm text-gray-500 text-right dark:text-gray-300">
                   <span className="mr-4">Total: {stats.total}/{stats.totalDays}</span>
                   <span>Current: {stats.currentStreak} </span>
                   <span>Record: {stats.longestStreak}</span>
@@ -266,7 +266,7 @@ const HabitTracker = () => {
     
     return (
       <div key={dateStr} className="flex flex-col items-center">
-        <div className="text-sm text-gray-500 mb-1">
+        <div className="text-sm text-gray-500 mb-1 dark:text-gray-300">
           {date.toLocaleDateString('en-US', { weekday: 'short' })}
         </div>
         <button
@@ -274,7 +274,7 @@ const HabitTracker = () => {
           disabled={disabled}
           className={`
             p-2 rounded-full w-10 h-10 flex items-center justify-center relative
-            ${isCompleted ? 'bg-green-500 text-white' : 'bg-gray-100'}
+            ${isCompleted ? 'bg-green-500 text-white' : 'bg-gray-100 dark:bg-gray-700'}
             ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80'}
             ${isToday ? 'ring-2 ring-blue-300' : ''}
           `}
@@ -291,36 +291,36 @@ const HabitTracker = () => {
       </div>
 
       {showAddHabit ? (
-        <div className="mt-4 p-4 bg-white rounded-lg shadow">
+        <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow">
           <div className="space-y-4">
             <input
               type="text"
               value={newHabitName}
               onChange={(e) => setNewHabitName(e.target.value)}
               placeholder="New habit name"
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded dark:bg-gray-700 dark:text-white dark:border-gray-600"
             />
             <div className="flex items-center space-x-2">
-              <label className="text-sm text-gray-600">Minutes of practice:</label>
+              <label className="text-sm text-gray-600 dark:text-gray-300 ">Minutes of practice:</label>
               <input
                 type="number"
                 value={newHabitMinutes}
                 onChange={(e) => setNewHabitMinutes(e.target.value)}
                 min="1"
                 max="60"
-                className="w-20 p-2 border rounded"
+                className="w-20 p-2 border rounded dark:bg-gray-700 dark:text-white dark:border-gray-600"
               />
             </div>
             <div className="flex justify-end space-x-2">
               <button
                 onClick={() => setShowAddHabit(false)}
-                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded dark:text-gray-300 dark:hover:bg-gray-700"
               >
                 Cancel
               </button>
               <button
                 onClick={addNewHabit}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-600"
               >
                 Add
               </button>
@@ -330,9 +330,9 @@ const HabitTracker = () => {
       ) : (
         <button
           onClick={() => setShowAddHabit(true)}
-          className="mt-4 w-full p-4 flex items-center justify-center space-x-2 bg-white rounded-lg shadow hover:bg-gray-50"
+          className="mt-4 w-full p-4 flex items-center justify-center space-x-2 bg-white rounded-lg shadow hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700"
         >
-          <Plus className="w-5 h-5" />
+          <Plus className="w-5 h-5 dark:text-white" />
           <span>Add New Habit</span>
         </button>
       )}
