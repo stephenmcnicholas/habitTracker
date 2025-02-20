@@ -1,4 +1,14 @@
 import React, { useState, useEffect } from 'react';
+// For Gradient Energy Slider
+//import { GradientEnergySlider} from './EnergySliders';
+// For Segmented Slider
+import { SegmentedEnergySlider} from './EnergySliders';
+// For Custom Thumb Slider
+//import { CustomThumbEnergySlider} from './EnergySliders';
+import { CircularSleepSlider } from './EnergySliders';
+
+
+
 
 const DailyLog = () => {
   const [formData, setFormData] = useState({
@@ -99,49 +109,29 @@ const DailyLog = () => {
       
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label className="block mb-2 font-semibold dark:text-white">Sleep</label>
-          <div className="space-y-2">
-            <input 
-              type="range" 
-              min="3" 
-              max="10" 
-              step="0.5" 
-              value={formData.sleep}
-              onChange={handleSleepSliderChange}
-              className="w-full"
-            />
-            <div className="flex justify-between text-sm dark:text-gray-300">
-              {[3, 4, 5, 6, 7, 8, 9, 10].map(num => (
-                <span key={num}>{num}</span>
-              ))}
-            </div>
-            <div className="text-center dark:text-white">
-              Selected value: {sleepValue}
-            </div>
-          </div>
+          {/*<label className="block mb-2 font-semibold dark:text-white">Sleep</label>*/}
+          <CircularSleepSlider 
+            value={formData.sleep}
+            onChange={(hours) => {
+              setFormData(prev => ({ ...prev, sleep: hours }));
+              setSleepValue(hours);
+            }}
+          />
         </div>
 
         <div>
-          <label className="block mb-2 font-semibold dark:text-white">Energy</label>
-          <div className="space-y-2">
-            <input 
-              type="range" 
-              min="1" 
-              max="5" 
-              value={formData.energy}
-              onChange={handleEnergySliderChange}
-              className="w-full"
-            />
-            <div className="flex justify-between text-sm dark:text-gray-300">
-              {[1, 2, 3, 4, 5].map(num => (
-                <span key={num}>{num}</span>
-              ))}
-            </div>
-            <div className="text-center dark:text-white">
-              Selected value: {energyValue}
-            </div>
-          </div>
-        </div>
+  <label className="block mb-2 font-semibold dark:text-white">Energy</label>
+  <div className="space-y-2">
+    <SegmentedEnergySlider 
+      value={formData.energy}
+      onChange={(e) => {
+        const value = Number(e.target.value);
+        setFormData(prev => ({ ...prev, energy: value }));
+        setEnergyValue(value);
+      }}
+    />
+  </div>
+</div>
 
         <div>
           <label className="block mb-2 font-semibold dark:text-white">Alcohol</label>
