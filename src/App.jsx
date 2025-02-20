@@ -30,6 +30,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HabitTracker />} />
           <Route path="/timer" element={<CountdownTimer />} />
+          <Route path="/dailylog" element={<DailyLog />} />
         </Routes>
       </div>
     </Router>

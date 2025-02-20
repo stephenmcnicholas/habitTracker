@@ -11,17 +11,24 @@ const DailyLog = () => {
   const [stats, setStats] = useState({
     avgSleep: '-',
     avgEnergy: '-',
-    totalAlc: '-'
+    totalAlc: '-',
+    stepStreak: '-',
+    dryStreak: '-'
   });
   const [recentEntries, setRecentEntries] = useState([]);
 
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbxIEillZ24Lg2L_8neq7vRkYwVYT0W-ScwZhS4BFFv69zCDAdwBwJ9Zc-1hHjxwHAN5/exec';
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbynd1P4XhEhxsO_G2cgYRm2XZQt6-iTWyuk27YVVfTsXWyWFjHnSXPIWoinDLlv2rgB/exec';
 
-  const handleSliderChange = (e, type) => {
+  const handleSleepSliderChange = (e) => {
     const value = e.target.value;
-    setFormData(prev => ({ ...prev, [type]: value }));
-    if (type === 'sleep') setSleepValue(value);
-    if (type === 'energy') setEnergyValue(value);
+    setFormData(prev => ({ ...prev, sleep: value }));
+    setSleepValue(value);
+  };
+
+  const handleEnergySliderChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({ ...prev, energy: value }));
+    setEnergyValue(value);
   };
 
   const handleSubmit = async (e) => {
@@ -63,13 +70,21 @@ const DailyLog = () => {
       setStats({
         avgSleep: data.averageSleep,
         avgEnergy: data.averageEnergy,
-        totalAlc: data.totalAlc
+        totalAlc: data.totalAlc,
+        stepStreak: data.stepStreak,
+        dryStreak: data.dryStreak
       });
       
       setRecentEntries(data.recentEntries);
     } catch (error) {
       console.error('Error fetching stats:', error);
-      setStats({ avgSleep: '-', avgEnergy: '-', totalAlc: '-' });
+      setStats({ 
+        avgSleep: '-', 
+        avgEnergy: '-', 
+        totalAlc: '-',
+        stepStreak: '-',
+        dryStreak: '-'
+      });
       setRecentEntries([]);
     }
   };
@@ -92,7 +107,7 @@ const DailyLog = () => {
               max="10" 
               step="0.5" 
               value={formData.sleep}
-              onChange={(e) => handleSliderChange(e, 'sleep')}
+              onChange={handleSleepSliderChange}
               className="w-full"
             />
             <div className="flex justify-between text-sm dark:text-gray-300">
@@ -114,7 +129,7 @@ const DailyLog = () => {
               min="1" 
               max="5" 
               value={formData.energy}
-              onChange={(e) => handleSliderChange(e, 'energy')}
+              onChange={handleEnergySliderChange}
               className="w-full"
             />
             <div className="flex justify-between text-sm dark:text-gray-300">
@@ -148,6 +163,19 @@ const DailyLog = () => {
       </form>
 
       <div className="mt-8 p-6 bg-gray-50 rounded-lg dark:bg-gray-800">
+        <div className="stats-grid grid grid-cols-2 gap-4 mb-6">
+          <div className="bg-white p-4 rounded shadow dark:bg-gray-700">
+            <h3 className="text-gray-600 dark:text-gray-300">Step Streak</h3>
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.stepStreak}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">days</div>
+          </div>
+          <div className="bg-white p-4 rounded shadow dark:bg-gray-700">
+            <h3 className="text-gray-600 dark:text-gray-300">Dry Streak</h3>
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.dryStreak}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">days</div>
+          </div>
+        </div>
+
         <h2 className="text-xl font-bold mb-4 dark:text-white">Last 7 Days Summary</h2>
         
         <div className="grid grid-cols-3 gap-4">
