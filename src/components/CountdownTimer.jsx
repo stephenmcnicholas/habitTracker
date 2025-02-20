@@ -87,7 +87,7 @@ const CountdownTimer = () => {
   const strokeDashoffset = circumference * (1 - progress);
 
   return (
-    <div className="max-w-md mx-auto p-6">
+    <div className="max-w-md mx-auto p-6 dark:bg-gray-900 dark:text-white">
       <div className="relative inline-block">
         <audio ref={audioRef}>
           <source src="https://cdn.freesound.org/previews/536/536108_11423254-lq.mp3" type="audio/mpeg" />
@@ -119,14 +119,14 @@ const CountdownTimer = () => {
         </svg>
 
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full">
-          <div className="flex justify-center items-center text-6xl font-mono mb-4 space-x-1">
+          <div className="flex justify-center items-center text-6xl font-mono mb-4 space-x-1 dark:text-white">
             {isEditing ? (
               <input
                 type="number"
                 value={editableMinutes}
                 onChange={handleMinutesChange}
                 onBlur={handleMinutesBlur}
-                className="w-24 bg-transparent text-center text-6xl font-mono focus:outline-none"
+                className="w-24 bg-transparent text-center text-6xl font-mono focus:outline-none dark:bg-gray-900 dark:text-white dark:border-gray-600"
                 autoFocus
               />
             ) : (
@@ -143,13 +143,13 @@ const CountdownTimer = () => {
           <div className="flex justify-center space-x-4">
             <button
               onClick={toggleTimer}
-              className="p-3 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+              className="p-3 rounded-full bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
             >
-              {isRunning ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+              {isRunning ? <Pause className="w-6 h-6 dark:text-white" /> : <Play className="w-6 h-6 dark:text-white" />}
             </button>
             <button
               onClick={resetTimer}
-              className="p-3 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors"
+              className="p-3 rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors"
             >
               <RotateCcw className="w-6 h-6" />
             </button>
